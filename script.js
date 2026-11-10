@@ -222,6 +222,7 @@ function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
+
 function updateStory() {
     if (reducedMotion.matches) return;
 
@@ -231,52 +232,34 @@ function updateStory() {
     if (distance <= 0) return;
 
     const progress = clamp(-rect.top / distance, 0, 1);
-    const stage = progress * storyPanels.length;
+    const panelCount = storyPanels.length;
 
+    // Spread transitions evenly across the scroll section.
+    const stage = progress * (panelCount - 1);
     const activeIndex = Math.min(
-        storyPanels.length - 1,
-        Math.floor(stage)
+        panelCount - 1,
+        Math.round(stage)
     );
 
     storyPanels.forEach(function(panel, index) {
-        const local = stage - index;
-        let opacity = 0;
-        let scale = .75;
+        const difference = Math.abs(stage - index);
 
-        if (local >= 0 && local < .18) {
-            const amount = local / .18;
-            opacity = amount;
-            scale = .75 + amount * .25;
-        } else if (local >= .18 && local <= .82) {
-            opacity = 1;
-            scale = 1;
-        } else if (local > .82 && local < 1) {
-            const amount = (local - .82) / .18;
-            opacity = 1 - amount;
-            scale = 1 + amount * .12;
-        }
+        // Smoothly fade and zoom between cards.
+        const visibility = clamp(1 - difference, 0, 1);
 
-        if (index === 0 && progress === 0) {
-            opacity = 1;
-            scale = 1;
-        }
-
-        if (index === storyPanels.length - 1 &&
-            progress >= .94) {
-            opacity = 1;
-            scale = 1;
-        }
+        const opacity = visibility;
+        const scale = 0.85 + visibility * 0.15;
 
         panel.style.opacity = opacity;
         panel.style.transform = "scale(" + scale + ")";
-        panel.style.zIndex =
-            index === activeIndex ? "2" : "1";
+        panel.style.zIndex = index === activeIndex ? "2" : "1";
     });
 
     progressDots.forEach(function(dot, index) {
         dot.classList.toggle("active", index === activeIndex);
     });
 }
+
 
 let scheduled = false;
 
