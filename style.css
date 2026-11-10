@@ -836,3 +836,11 @@ footer {
         transition: none;
     }
 }
+
+
+/* Faster scrolling animation on mobile */
+@media (max-width: 768px) {
+    .scroll-story {
+        height: 200vh;
+    }
+}
