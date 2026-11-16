@@ -1,29 +1,14 @@
 
-// WiFiRx - Website Functionality
+// ==========================================
+// WiFiRx - Your Prescription for Better Wi-Fi
+// ==========================================
 
-const startButton = document.getElementById("startBtn");
-const diagnoseButton = document.getElementById("diagnoseBtn");
-const wifiProblem = document.getElementById("wifiProblem");
-const problemLocation = document.getElementById("problemLocation");
-const results = document.getElementById("results");
-const compareButton = document.getElementById("compareBtn");
-const comparisonResults = document.getElementById("comparisonResults");
-const speedChart = document.getElementById("speedChart");
+// General helpers
 
 const reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
 );
 
-// Start Troubleshooting
-startButton.addEventListener("click", function() {
-    document.getElementById("diagnosis").scrollIntoView({
-        behavior: reducedMotion.matches ? "auto" : "smooth",
-        block: "start"
-    });
-    wifiProblem.focus({ preventScroll: true });
-});
-
-// Safe result rendering
 function showResult(element, heading, message, error = false) {
     element.replaceChildren();
 
@@ -37,7 +22,33 @@ function showResult(element, heading, message, error = false) {
     element.classList.toggle("error", error);
 }
 
-// Personalized Diagnosis
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
+
+
+// ==========================================
+// Start Troubleshooting
+// ==========================================
+
+const startButton = document.getElementById("startBtn");
+const diagnoseButton = document.getElementById("diagnoseBtn");
+const wifiProblem = document.getElementById("wifiProblem");
+const problemLocation = document.getElementById("problemLocation");
+const results = document.getElementById("results");
+
+startButton.addEventListener("click", function() {
+    document.getElementById("diagnosis").scrollIntoView({
+        behavior: reducedMotion.matches ? "auto" : "smooth",
+        block: "start"
+    });
+});
+
+
+// ==========================================
+// Personalized Troubleshooting
+// ==========================================
+
 diagnoseButton.addEventListener("click", function() {
     const problem = wifiProblem.value;
     const location = problemLocation.value;
@@ -104,127 +115,410 @@ diagnoseButton.addEventListener("click", function() {
             "fails, check your internet service status.";
     }
 
-    showResult(results, "Your WiFiRx Recommendation", recommendation);
+    showResult(
+        results,
+        "Your WiFiRx Recommendation",
+        recommendation
+    );
 });
 
-// Room Comparison
-compareButton.addEventListener("click", function() {
-    const room1 = document.getElementById("room1").value.trim();
-    const room2 = document.getElementById("room2").value.trim();
-    const speed1Text = document.getElementById("speed1").value;
-    const speed2Text = document.getElementById("speed2").value;
 
+// ==========================================
+// Dynamic Room Comparison
+// ==========================================
+
+const roomsContainer = document.getElementById("roomsContainer");
+const addRoomButton = document.getElementById("addRoomBtn");
+const compareButton = document.getElementById("compareBtn");
+const comparisonResults = document.getElementById("comparisonResults");
+const speedChart = document.getElementById("speedChart");
+const chartBars = document.getElementById("chartBars");
+
+let nextRoomId = 1;
+
+// Hide outdated results whenever room data changes
+function clearComparison() {
+    comparisonResults.replaceChildren();
+    comparisonResults.classList.remove("error");
     speedChart.hidden = true;
+    chartBars.replaceChildren();
+}
 
-    if (!room1 || !room2 ||
-        speed1Text === "" || speed2Text === "") {
-        showResult(
-            comparisonResults,
-            "Missing Information",
-            "Please enter both room names and speeds.",
-            true
+// Renumber rooms after adding or removing
+function updateRoomNumbers() {
+    const entries = roomsContainer.querySelectorAll(".room-entry");
+
+    entries.forEach(function(entry, index) {
+        entry.querySelector(".room-entry-title").textContent =
+            "Room " + (index + 1);
+
+        const removeButton = entry.querySelector(
+            ".remove-room-button"
         );
-        return;
-    }
 
-    const speed1 = Number(speed1Text);
-    const speed2 = Number(speed2Text);
+        removeButton.hidden = entries.length <= 2;
+    });
+}
 
-    if (!Number.isFinite(speed1) ||
-        !Number.isFinite(speed2) ||
-        speed1 < 0 || speed2 < 0) {
-        showResult(
-            comparisonResults,
-            "Invalid Speed",
-            "Please enter valid download speeds of 0 Mbps or higher.",
-            true
-        );
-        return;
-    }
+// Create a new room entry
+function addRoom(name = "", speed = "") {
+    const roomId = nextRoomId++;
 
-    if (room1.toLowerCase() === room2.toLowerCase()) {
-        showResult(
-            comparisonResults,
-            "Check Room Names",
-            "Please enter two different room names.",
-            true
-        );
-        return;
-    }
+    const entry = document.createElement("div");
+    entry.className = "room-entry";
 
-    let message;
+    // Header
+    const header = document.createElement("div");
+    header.className = "room-entry-header";
 
-    if (speed1 === speed2) {
-        message =
-            "Both rooms measured " + speed1 +
-            " Mbps. No speed difference was detected.";
-    } else {
-        const fasterRoom = speed1 > speed2 ? room1 : room2;
-        const slowerRoom = speed1 < speed2 ? room1 : room2;
-        const fasterSpeed = Math.max(speed1, speed2);
-        const slowerSpeed = Math.min(speed1, speed2);
+    const title = document.createElement("span");
+    title.className = "room-entry-title";
 
-        const difference =
-            ((fasterSpeed - slowerSpeed) / fasterSpeed) * 100;
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.className = "remove-room-button";
+    removeButton.textContent = "Remove";
+    removeButton.setAttribute("aria-label", "Remove room");
 
-        let advice;
+    removeButton.addEventListener("click", function() {
+        if (roomsContainer.children.length <= 2) return;
 
-        if (difference >= 50) {
-            advice =
-                "This is a large difference. Check router placement, " +
-                "walls, obstacles, and coverage in " + slowerRoom + ".";
-        } else if (difference >= 20) {
-            advice =
-                "This is a noticeable difference. Try testing " +
-                "closer to the router and checking interference.";
-        } else {
-            advice =
-                "The speeds are relatively close. Small differences " +
-                "can occur because of network activity.";
+        entry.remove();
+        updateRoomNumbers();
+        clearComparison();
+    });
+
+    header.append(title, removeButton);
+
+    // Input fields
+    const fields = document.createElement("div");
+    fields.className = "room-fields";
+
+    const nameGroup = document.createElement("div");
+    nameGroup.className = "form-group";
+
+    const nameLabel = document.createElement("label");
+    nameLabel.textContent = "Room Name";
+    nameLabel.htmlFor = "roomName" + roomId;
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.id = "roomName" + roomId;
+    nameInput.className = "room-name";
+    nameInput.placeholder = "e.g., Living Room";
+    nameInput.maxLength = 50;
+    nameInput.value = name;
+
+    nameGroup.append(nameLabel, nameInput);
+
+    const speedGroup = document.createElement("div");
+    speedGroup.className = "form-group";
+
+    const speedLabel = document.createElement("label");
+    speedLabel.textContent = "Download Speed (Mbps)";
+    speedLabel.htmlFor = "roomSpeed" + roomId;
+
+    const speedInput = document.createElement("input");
+    speedInput.type = "number";
+    speedInput.id = "roomSpeed" + roomId;
+    speedInput.className = "room-speed";
+    speedInput.placeholder = "e.g., 250";
+    speedInput.min = "0";
+    speedInput.step = "any";
+    speedInput.value = speed;
+
+    speedGroup.append(speedLabel, speedInput);
+
+    fields.append(nameGroup, speedGroup);
+    entry.append(header, fields);
+
+    roomsContainer.appendChild(entry);
+
+    nameInput.addEventListener("input", clearComparison);
+    speedInput.addEventListener("input", clearComparison);
+
+    updateRoomNumbers();
+
+    return entry;
+}
+
+// Start with two rooms
+addRoom();
+addRoom();
+
+// Add another room
+addRoomButton.addEventListener("click", function() {
+    const entry = addRoom();
+    clearComparison();
+
+    entry.querySelector(".room-name").focus();
+});
+
+// Compare all entered rooms
+compareButton.addEventListener("click", function() {
+    const entries = roomsContainer.querySelectorAll(".room-entry");
+    const rooms = [];
+    const seenNames = new Set();
+
+    clearComparison();
+
+    for (const entry of entries) {
+        const name = entry.querySelector(".room-name").value.trim();
+        const speedInput = entry.querySelector(".room-speed");
+        const speedText = speedInput.value.trim();
+        const speed = Number(speedText);
+
+        if (!name || speedText === "") {
+            showResult(
+                comparisonResults,
+                "Missing Information",
+                "Please enter a room name and download speed for every room.",
+                true
+            );
+            return;
         }
 
-        message =
-            fasterRoom + " measured " + fasterSpeed +
-            " Mbps and " + slowerRoom + " measured " +
-            slowerSpeed + " Mbps. " + slowerRoom +
-            " was " + difference.toFixed(1) +
-            "% slower than " + fasterRoom + ". " + advice;
+        if (!Number.isFinite(speed) || speed < 0 ||
+            !speedInput.validity.valid) {
+            showResult(
+                comparisonResults,
+                "Invalid Speed",
+                "Please enter a valid download speed of 0 Mbps or higher for every room.",
+                true
+            );
+            return;
+        }
+
+        const normalizedName = name.toLowerCase();
+
+        if (seenNames.has(normalizedName)) {
+            showResult(
+                comparisonResults,
+                "Duplicate Room Name",
+                "Please use a different name for each room.",
+                true
+            );
+            return;
+        }
+
+        seenNames.add(normalizedName);
+        rooms.push({ name, speed });
     }
 
-    showResult(comparisonResults, "Your Speed Comparison", message);
+    if (rooms.length < 2) {
+        showResult(
+            comparisonResults,
+            "More Rooms Needed",
+            "Please enter at least two rooms.",
+            true
+        );
+        return;
+    }
 
-    // Visual bar chart
-    const maximum = Math.max(speed1, speed2);
+    const sortedRooms = [...rooms].sort(
+        (a, b) => b.speed - a.speed
+    );
 
-    document.getElementById("chartRoom1").textContent = room1;
-    document.getElementById("chartRoom2").textContent = room2;
-    document.getElementById("chartSpeed1").textContent =
-        speed1 + " Mbps";
-    document.getElementById("chartSpeed2").textContent =
-        speed2 + " Mbps";
+    const fastest = sortedRooms[0];
+    const slowest = sortedRooms[sortedRooms.length - 1];
+    const maximum = fastest.speed;
+    const minimum = slowest.speed;
 
-    document.getElementById("bar1").style.width =
-        (maximum === 0 ? 0 : speed1 / maximum * 100) + "%";
-    document.getElementById("bar2").style.width =
-        (maximum === 0 ? 0 : speed2 / maximum * 100) + "%";
+    // Short, easy-to-read comparison results
+    let message = "";
+
+    if (maximum === minimum) {
+        message =
+            "All rooms have the same measured download speed. " +
+            "No difference was detected.";
+
+    } else {
+        const difference = maximum === 0
+            ? 0
+            : ((maximum - minimum) / maximum) * 100;
+
+        const slowestNames = rooms
+            .filter(room => room.speed === minimum)
+            .map(room => room.name)
+            .join(", ");
+
+        if (difference >= 50) {
+            message =
+                "Large speed difference detected! " +
+                slowestNames + " is significantly slower. " +
+                "Check router placement, walls, and interference " +
+                "near this area. Repeat the test to confirm.";
+
+        } else if (difference >= 20) {
+            message =
+                "Noticeable speed difference detected. " +
+                slowestNames + " has a slower connection. " +
+                "Try testing closer to your router and checking " +
+                "for obstacles or interference.";
+
+        } else {
+            message =
+                "Your room speeds are relatively similar. " +
+                "Small differences may result from " +
+                "normal network activity.";
+        }
+    }
+
+    showResult(
+        comparisonResults,
+        "Your Room Speed Comparison",
+        message
+    );
+
+    // Create chart bars for every room
+    sortedRooms.forEach(function(room) {
+        const row = document.createElement("div");
+        row.className = "speed-row";
+
+        const label = document.createElement("div");
+        label.className = "speed-label";
+
+        const roomName = document.createElement("span");
+        roomName.textContent = room.name;
+
+        const roomSpeed = document.createElement("strong");
+        roomSpeed.textContent = room.speed + " Mbps";
+
+        label.append(roomName, roomSpeed);
+
+        const track = document.createElement("div");
+        track.className = "bar-track";
+
+        const bar = document.createElement("div");
+        bar.className = "bar";
+
+        // Fastest room is purple, other rooms are teal
+        bar.classList.add(
+            room.speed === maximum ? "purple-bar" : "teal-bar"
+        );
+
+        const percentage = maximum === 0
+            ? 0
+            : (room.speed / maximum) * 100;
+
+        bar.style.width = percentage + "%";
+
+        track.appendChild(bar);
+        row.append(label, track);
+        chartBars.appendChild(row);
+    });
 
     speedChart.hidden = false;
 });
 
-// Scroll animation
+
+// ==========================================
+// Connection Check
+// ==========================================
+
+const connectionButton =
+    document.getElementById("checkConnectionBtn");
+
+const connectionResult =
+    document.getElementById("connectionResult");
+
+connectionButton.addEventListener("click", async function() {
+    connectionButton.disabled = true;
+
+    showResult(
+        connectionResult,
+        "Checking Your Connection",
+        "Please wait while WiFiRx checks connectivity."
+    );
+
+    try {
+        if (window.location.protocol === "file:") {
+            showResult(
+                connectionResult,
+                "Published Website Required",
+                "Open WiFiRx on GitHub Pages to run this check.",
+                true
+            );
+            return;
+        }
+
+        if (!navigator.onLine) {
+            showResult(
+                connectionResult,
+                "Browser Reports Offline",
+                "Your browser reports that you are offline. " +
+                "Check your Wi-Fi or internet connection.",
+                true
+            );
+            return;
+        }
+
+        const controller = new AbortController();
+
+        const timeout = setTimeout(
+            () => controller.abort(),
+            5000
+        );
+
+        try {
+            const response = await fetch(
+                new URL("index.html", document.baseURI),
+                {
+                    method: "GET",
+                    cache: "no-store",
+                    signal: controller.signal
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Request failed");
+            }
+
+            showResult(
+                connectionResult,
+                "Connection Check Complete",
+                "WiFiRx is reachable! Your browser passed " +
+                "this basic connectivity check. " +
+                "This does not measure Wi-Fi speed."
+            );
+
+        } finally {
+            clearTimeout(timeout);
+        }
+
+    } catch (error) {
+        showResult(
+            connectionResult,
+            "Connection Could Not Be Verified",
+            "WiFiRx could not complete the check. " +
+            "Your connection may be unavailable, " +
+            "or the request may have failed.",
+            true
+        );
+
+    } finally {
+        connectionButton.disabled = false;
+    }
+});
+
+
+// ==========================================
+// Original WiFiRx Scrolling Animation
+// ==========================================
+
 const storySection = document.querySelector(".scroll-story");
-const storyPanels = document.querySelectorAll(".story-panel");
+const storyPanels = document.querySelectorAll(
+    ".scroll-story .story-panel"
+);
 const progressDots = document.querySelectorAll(
     ".story-progress span"
 );
 
-function clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
-}
-
-
 function updateStory() {
-    if (reducedMotion.matches) return;
+    if (!storySection || reducedMotion.matches ||
+        storyPanels.length === 0) {
+        return;
+    }
 
     const rect = storySection.getBoundingClientRect();
     const distance = storySection.offsetHeight - window.innerHeight;
@@ -232,101 +526,138 @@ function updateStory() {
     if (distance <= 0) return;
 
     const progress = clamp(-rect.top / distance, 0, 1);
-    const panelCount = storyPanels.length;
-
-    // Spread transitions evenly across the scroll section.
-    const stage = progress * (panelCount - 1);
-    const activeIndex = Math.min(
-        panelCount - 1,
-        Math.round(stage)
-    );
+    const stage = progress * (storyPanels.length - 1);
+    const activeIndex = Math.round(stage);
 
     storyPanels.forEach(function(panel, index) {
         const difference = Math.abs(stage - index);
-
-        // Smoothly fade and zoom between cards.
         const visibility = clamp(1 - difference, 0, 1);
 
-        const opacity = visibility;
-        const scale = 0.85 + visibility * 0.15;
+        panel.style.opacity = visibility;
 
-        panel.style.opacity = opacity;
-        panel.style.transform = "scale(" + scale + ")";
-        panel.style.zIndex = index === activeIndex ? "2" : "1";
+        panel.style.transform =
+            "translate(-50%, -50%) scale(" +
+            (0.85 + visibility * 0.15) + ")";
+
+        panel.style.zIndex =
+            index === activeIndex ? "2" : "1";
     });
 
     progressDots.forEach(function(dot, index) {
-        dot.classList.toggle("active", index === activeIndex);
-    });
-}
-
-
-let scheduled = false;
-
-function requestStoryUpdate() {
-    if (scheduled) return;
-    scheduled = true;
-
-    requestAnimationFrame(function() {
-        updateStory();
-        scheduled = false;
-    });
-}
-
-window.addEventListener("scroll", requestStoryUpdate, {
-    passive: true
-});
-window.addEventListener("resize", requestStoryUpdate);
-
-reducedMotion.addEventListener("change", function() {
-    if (reducedMotion.matches) {
-        storyPanels.forEach(function(panel) {
-            panel.style.opacity = "";
-            panel.style.transform = "";
-            panel.style.zIndex = "";
-        });
-    } else {
-        requestStoryUpdate();
-    }
-});
-
-requestStoryUpdate();
-
-// Highlight the navigation tab for the current section.
-const navLinks = document.querySelectorAll(".nav-links a");
-
-function updateActiveNav() {
-    const position = window.scrollY + 180;
-    const diagnosis = document.getElementById("diagnosis");
-    const roomComparison = document.getElementById("roomComparison");
-
-    let activeSection = "#home";
-
-    if (diagnosis && position >= diagnosis.offsetTop) {
-        activeSection = "#diagnosis";
-    }
-
-    // The tools are side by side on desktop, so select
-    // the tab explicitly when its navigation link is clicked.
-    navLinks.forEach(function(link) {
-        link.classList.toggle(
+        dot.classList.toggle(
             "active",
-            link.getAttribute("href") === activeSection
+            index === activeIndex
         );
     });
 }
+
+let storyUpdateScheduled = false;
+
+function requestStoryUpdate() {
+    if (storyUpdateScheduled) return;
+
+    storyUpdateScheduled = true;
+
+    requestAnimationFrame(function() {
+        updateStory();
+        storyUpdateScheduled = false;
+    });
+}
+
+window.addEventListener(
+    "scroll",
+    requestStoryUpdate,
+    { passive: true }
+);
+
+window.addEventListener("resize", requestStoryUpdate);
+requestStoryUpdate();
+
+
+// ==========================================
+// Highlight Navigation Links
+// ==========================================
+
+const navLinks = document.querySelectorAll(".nav-links a");
 
 navLinks.forEach(function(link) {
     link.addEventListener("click", function() {
         navLinks.forEach(function(item) {
             item.classList.remove("active");
         });
+
         link.classList.add("active");
     });
 });
 
-window.addEventListener("scroll", updateActiveNav, {
-    passive: true
-});
 
-updateActiveNav();
+// ==========================================
+// Full-Screen Homepage and Auto-Hiding Menu
+// ==========================================
+
+const wifiNavbar = document.querySelector(".navbar");
+
+function updateNavbarHeight() {
+    if (!wifiNavbar) return;
+
+    document.documentElement.style.setProperty(
+        "--navbar-height",
+        wifiNavbar.offsetHeight + "px"
+    );
+}
+
+updateNavbarHeight();
+
+window.addEventListener("resize", updateNavbarHeight);
+
+if ("ResizeObserver" in window && wifiNavbar) {
+    const navbarResizeObserver = new ResizeObserver(
+        updateNavbarHeight
+    );
+
+    navbarResizeObserver.observe(wifiNavbar);
+}
+
+// Hide navigation when scrolling down;
+// show it when scrolling up.
+
+let previousScrollY = Math.max(0, window.scrollY);
+let scrollDirectionDistance = 0;
+
+function handleNavbarScroll() {
+    if (!wifiNavbar) return;
+
+    const currentScrollY = Math.max(0, window.scrollY);
+    const difference = currentScrollY - previousScrollY;
+
+    if (currentScrollY <= 30) {
+        wifiNavbar.classList.remove("nav-hidden");
+        scrollDirectionDistance = 0;
+
+    } else if (difference > 0) {
+        scrollDirectionDistance =
+            Math.max(0, scrollDirectionDistance) + difference;
+
+        if (scrollDirectionDistance > 8) {
+            wifiNavbar.classList.add("nav-hidden");
+        }
+
+    } else if (difference < 0) {
+        scrollDirectionDistance =
+            Math.min(0, scrollDirectionDistance) + difference;
+
+        if (scrollDirectionDistance < -8) {
+            wifiNavbar.classList.remove("nav-hidden");
+        }
+    }
+
+    previousScrollY = currentScrollY;
+}
+
+window.addEventListener(
+    "scroll",
+    handleNavbarScroll,
+    { passive: true }
+);
+
+handleNavbarScroll();
