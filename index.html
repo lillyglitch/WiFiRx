@@ -4,132 +4,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#68158d">
-    <meta name="description" content="WiFiRx helps you diagnose home Wi-Fi issues, get personalized fixes, and compare room speeds.">
+    <meta name="theme-color" content="#771ca5">
+    <meta name="description" content="WiFiRx helps home users troubleshoot Wi-Fi issues and compare room speeds.">
     <title>WiFiRx | Your Prescription for Better Wi-Fi</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
+
+    <!-- Navigation -->
     <nav class="navbar" aria-label="Main navigation">
         <a href="#home" class="nav-brand">
             <img src="wifirx-nav.png" alt="WiFiRx Home">
         </a>
+
         <div class="nav-links">
             <a href="#home">Home</a>
             <a href="#diagnosis">Troubleshoot</a>
             <a href="#roomComparison">Compare Rooms</a>
+            <a href="#connectionCheck">Check Connection</a>
         </div>
     </nav>
 
-    <header id="home" class="hero">
+    <!-- Homepage -->
+    <header class="hero" id="home">
         <div class="hero-glow glow-purple"></div>
         <div class="hero-glow glow-teal"></div>
+
         <div class="hero-content">
-            <span class="hero-eyebrow">
-                SIMPLE HOME WI-FI SUPPORT
-            </span>
+            <span class="hero-eyebrow">SIMPLE HOME WI-FI SUPPORT</span>
+
             <img
                 class="hero-logo"
                 src="wifirx-logo.png"
                 alt="WiFiRx - Your Prescription for Better Wi-Fi"
             >
+
             <p class="hero-description">
                 Better Wi-Fi starts with understanding the problem.
                 Find practical fixes and improve your connection,
                 one step at a time.
             </p>
+
             <button class="primary-button" id="startBtn" type="button">
-                Start Troubleshooting <span aria-hidden="true">→</span>
+                Start Troubleshooting →
             </button>
+
             <a class="discover-link" href="#how-it-works">
-                Discover how WiFiRx works
-                <span aria-hidden="true">↓</span>
+                Discover how WiFiRx works ↓
             </a>
         </div>
-        <div class="hero-wave"></div>
     </header>
 
-    <section id="how-it-works" class="scroll-story"
-             aria-label="How WiFiRx works">
+    <!-- Interactive Scrolling Experience -->
+    <section class="scroll-story" id="how-it-works">
         <div class="story-stage">
             <div class="story-top">
-                <span class="section-eyebrow">THE WIFI RX EXPERIENCE</span>
+                <span class="section-eyebrow">THE WIFIRX EXPERIENCE</span>
                 <h2>How WiFiRx Works</h2>
-                <p>Three simple steps toward better Wi-Fi.</p>
+                <p>Scroll to discover three simple steps toward better Wi-Fi.</p>
             </div>
 
-            <div class="story-panel">
-                <div class="story-step"></div>
-                <div class="story-icon">
-                    <svg viewBox="0 0 64 64" aria-hidden="true">
-                        <circle cx="27" cy="27" r="15"/>
-                        <path d="M38 38 53 53"/>
-                        <path d="m21 27 4 4 8-9"/>
-                    </svg>
-                </div>
+            <article class="story-panel">
+                <div class="story-icon">⌕</div>
                 <h3>Diagnose Wi-Fi Issues</h3>
                 <p>
                     Identify possible causes of slow speeds,
                     weak signals, and connection problems.
                 </p>
-            </div>
+            </article>
 
-            <div class="story-panel">
-                <div class="story-step"></div>
-                <div class="story-icon">
-                    <svg viewBox="0 0 64 64" aria-hidden="true">
-                        <path d="M39 10a17 17 0 0 0-19 21L8 43a8 8 0 0 0 11 11l12-12a17 17 0 0 0 21-19L41 34l-11-11z"/>
-                    </svg>
-                </div>
+            <article class="story-panel">
+                <div class="story-icon">✚</div>
                 <h3>Get Personalized Fixes</h3>
                 <p>
-                    Get clear troubleshooting recommendations
-                    based on your Wi-Fi problem and its location.
+                    Get clear recommendations based on your
+                    Wi-Fi problem and its location.
                 </p>
-            </div>
+            </article>
 
-            <div class="story-panel">
-                <div class="story-step"></div>
-                <div class="story-icon teal-icon">
-                    <svg viewBox="0 0 64 64" aria-hidden="true">
-                        <rect x="9" y="38" width="11" height="17" rx="2"/>
-                        <rect x="26" y="27" width="11" height="28" rx="2"/>
-                        <rect x="43" y="13" width="11" height="42" rx="2"/>
-                    </svg>
-                </div>
+            <article class="story-panel">
+                <div class="story-icon teal-icon">▥</div>
                 <h3>Compare Room Speeds</h3>
                 <p>
-                    Compare download speeds between rooms
-                    and spot possible Wi-Fi coverage issues.
+                    Compare download speeds throughout your home
+                    to identify possible coverage problems.
                 </p>
-            </div>
+            </article>
 
             <div class="story-progress" aria-hidden="true">
-                <span></span><span></span><span></span>
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
-            <p class="story-scroll-tip">SCROLL TO EXPLORE</p>
+
+            <div class="story-scroll-tip">KEEP SCROLLING ↓</div>
         </div>
     </section>
 
+    <!-- WiFiRx Tools -->
     <main class="tools-section" id="tools">
         <div class="tools-heading">
             <span class="section-eyebrow">YOUR WI-FI TOOLKIT</span>
             <h2>Let's Improve Your Connection</h2>
             <p>
-                Two simple tools to help you understand
+                Three simple tools to help you understand
                 and troubleshoot your home Wi-Fi.
             </p>
         </div>
 
         <div class="tools-grid">
+
+            <!-- Troubleshooting Tool -->
             <section class="tool-card" id="diagnosis">
-                <div class="tool-icon purple-tool-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 3v18M3 12h18"/>
-                    </svg>
-                </div>
+                <div class="tool-icon purple-tool-icon">✚</div>
                 <h3>Wi-Fi Troubleshooting</h3>
+
                 <p class="tool-description">
                     Tell us what's happening and get
                     recommended next steps.
@@ -139,6 +129,7 @@
                     <label for="wifiProblem">
                         What Wi-Fi problem are you experiencing?
                     </label>
+
                     <select id="wifiProblem">
                         <option value="">Select a Wi-Fi problem</option>
                         <option value="slow">Slow Internet Speeds</option>
@@ -152,6 +143,7 @@
                     <label for="problemLocation">
                         Where is the problem happening?
                     </label>
+
                     <select id="problemLocation">
                         <option value="">Select a location</option>
                         <option value="oneRoom">Only in one room</option>
@@ -161,90 +153,106 @@
                 </div>
 
                 <button class="purple-button" id="diagnoseBtn" type="button">
-                    Get My WiFiRx <span aria-hidden="true">→</span>
+                    Get My WiFiRx →
                 </button>
 
-                <div id="results" class="result-box" role="status"
-                     aria-live="polite"></div>
+                <div
+                    id="results"
+                    class="result-box"
+                    role="status"
+                    aria-live="polite"
+                ></div>
             </section>
 
+            <!-- Dynamic Room Comparison -->
             <section class="tool-card" id="roomComparison">
-                <div class="tool-icon teal-tool-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M4 19v-5M10 19V9M16 19V5M22 19H2"/>
-                    </svg>
-                </div>
+                <div class="tool-icon teal-tool-icon">▥</div>
                 <h3>Compare Room Speeds</h3>
+
                 <p class="tool-description">
-                    Compare two speed test results to
-                    identify possible coverage differences.
+                    Compare download speeds in multiple rooms
+                    to find areas with slower Wi-Fi.
                 </p>
 
                 <p class="info-note">
-                    Tip: Use the same device to run a download
-                    speed test in each room, then enter the results.
+                    Tip: Run a download speed test in each room
+                    using the same device. Enter each result in Mbps.
+                    Repeat tests for more reliable comparisons.
                 </p>
 
-                <div class="room-grid">
-                    <div class="form-group">
-                        <label for="room1">Room 1 Name</label>
-                        <input id="room1" type="text" maxlength="50"
-                               placeholder="Living Room">
-                    </div>
-                    <div class="form-group">
-                        <label for="speed1">Speed (Mbps)</label>
-                        <input id="speed1" type="number" min="0"
-                               step="any" placeholder="250">
-                    </div>
-                    <div class="form-group">
-                        <label for="room2">Room 2 Name</label>
-                        <input id="room2" type="text" maxlength="50"
-                               placeholder="Bedroom">
-                    </div>
-                    <div class="form-group">
-                        <label for="speed2">Speed (Mbps)</label>
-                        <input id="speed2" type="number" min="0"
-                               step="any" placeholder="75">
-                    </div>
+                <div id="roomsContainer" class="rooms-container">
+                    <!-- JavaScript creates the room inputs here -->
                 </div>
 
-                <button class="teal-button" id="compareBtn" type="button">
-                    Compare Rooms <span aria-hidden="true">→</span>
+                <button
+                    class="add-room-button"
+                    id="addRoomBtn"
+                    type="button"
+                >
+                    + Add Another Room
                 </button>
 
-                <div id="comparisonResults" class="result-box"
-                     role="status" aria-live="polite"></div>
+                <button
+                    class="teal-button"
+                    id="compareBtn"
+                    type="button"
+                >
+                    Compare All Rooms →
+                </button>
+
+                <div
+                    id="comparisonResults"
+                    class="result-box"
+                    role="status"
+                    aria-live="polite"
+                ></div>
 
                 <div id="speedChart" class="speed-chart" hidden>
                     <h4>Download Speed Comparison</h4>
-                    <div class="speed-row">
-                        <div class="speed-label">
-                            <span id="chartRoom1"></span>
-                            <strong id="chartSpeed1"></strong>
-                        </div>
-                        <div class="bar-track">
-                            <div id="bar1" class="bar purple-bar"></div>
-                        </div>
-                    </div>
-                    <div class="speed-row">
-                        <div class="speed-label">
-                            <span id="chartRoom2"></span>
-                            <strong id="chartSpeed2"></strong>
-                        </div>
-                        <div class="bar-track">
-                            <div id="bar2" class="bar teal-bar"></div>
-                        </div>
-                    </div>
+                    <div id="chartBars"></div>
+                    <p class="chart-note">
+                        Purple = fastest measured room.
+                        Teal = other rooms.
+                    </p>
                 </div>
             </section>
         </div>
 
+        <!-- Connectivity Check -->
+        <section class="tool-card connection-check" id="connectionCheck">
+            <div class="tool-icon purple-tool-icon">⌁</div>
+            <h3>Check Your Connection</h3>
+
+            <p class="tool-description">
+                Check whether your browser can reach WiFiRx online.
+                This is a basic connectivity check, not a speed test.
+            </p>
+
+            <button
+                class="purple-button"
+                id="checkConnectionBtn"
+                type="button"
+            >
+                Check My Connection →
+            </button>
+
+            <div
+                id="connectionResult"
+                class="result-box"
+                role="status"
+                aria-live="polite"
+            ></div>
+        </section>
+
         <p class="disclaimer">
             WiFiRx provides general troubleshooting suggestions.
-            It does not directly measure your connection or guarantee a diagnosis.
+            Room speeds are manually entered measurements.
+            Its connection check does not measure Wi-Fi speed
+            or guarantee a diagnosis.
         </p>
     </main>
 
+    <!-- Footer -->
     <footer>
         <div class="footer-inner">
             <img src="wifirx-nav.png" alt="WiFiRx Logo">
@@ -256,5 +264,6 @@
             <a href="#home">Back to Top ↑</a>
         </div>
     </footer>
+
 </body>
 </html>
